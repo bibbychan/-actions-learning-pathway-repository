@@ -32,39 +32,43 @@ jobs:
 
   #Deployment job
   deploy:
-    needs: test #This job will only run if the "test" job is successful
+    needs: test
 
-    permissions: #This is the permissions that the deployment job needs
+    permissions:
       contents: write
-      pages: write
-      id-token: write
+      pages: write     
+      id-token: write  
 
-    environment: #
+    environment:
       name: production
       url: ${{ steps.deployment.outputs.page_url }}
 
     runs-on: ubuntu-latest
+
     steps:
-      - name: checkout repo  #Checkout the repository with authentication
+      - name: checkout repo
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: use node.js #Set up Node and build the application for deployment
+      - name: use node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
-
-      - name: configure github pages # Configure Pages for deployment
+          node-version: '18.x'
+      
+      - name: configure github pages
         uses: actions/configure-pages@v3
         with:
-            static_site_generator: next
+          static_site_generator: next
+
+      - run: npm install
+      - run: npm run build
 
       - name: upload artifacts
-      uses: actions/upload-pages-artifact@v1
-      with: 
-        path: "./out"
-      
+        uses: actions/upload-pages-artifact@v1
+        with: 
+          path: "./out"
+
       - name: deploy
-      id: deployment
-      uses: actions/deploy-pages@v1
+        id: deployment
+        uses: actions/deploy-pages@v1
